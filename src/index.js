@@ -3,17 +3,17 @@ function eval() {
     return;
 }
 
-function priority(x, y) {
-    if (y === '(' || y === ')') {
+function priority(currentOperator, previousOperator) {
+    if (previousOperator === '(' || previousOperator === ')') {
         return false; }
-    if ((x === '*' || x === '/') && (y === '+' || y === '-')) {
+    if ((currentOperator === '*' || currentOperator === '/') && (previousOperator === '+' || previousOperator === '-')) {
         return false;
     } else {
         return true;}
 }
 
-function usePriority (z,  b,  a) {
-    switch (z)
+function operationExec(operator,  b,  a) {
+    switch (operator)
     {
         case '+': return a + b;
         case '-': return a - b;
@@ -22,11 +22,6 @@ function usePriority (z,  b,  a) {
     }
     return 0;
 }
-
-function isInt(value) {
-    return !isNaN(value) && (function(x) {return (x | 0) === x;})(parseFloat(value));
-}
-
 
 function expressionCalculator(expr) {
     let count = 0;
@@ -50,7 +45,7 @@ function expressionCalculator(expr) {
         if (expr[i] !== ')' && expr[i] !== '(' && expr[i] !== '*' && expr[i] !== '/' && expr[i] !== '+' && expr[i] !== '-') {
             let k = expr[i];
 
-            while (isInt(expr[i+1]) === true) {
+            while (Number.isInteger(+(expr[i+1])) === true) {
                 k += expr[i+1];
                 i++;
             }
@@ -62,22 +57,22 @@ function expressionCalculator(expr) {
         } else if (expr[i] === ')') {
             
           while (arr[arr.length-1] !== '(') {
-                values.push(usePriority(arr.pop(), values.pop(), values.pop()));
+                values.push(operationExec(arr.pop(), values.pop(), values.pop()));
             }
             arr.pop();
           
         } else if (expr[i] === '+' || expr[i] === '-' || expr[i] === '*' || expr[i] === '/') {
           
             while (arr.length!== 0 && priority(expr[i], arr[arr.length-1])) {
-                values.push(usePriority(arr.pop(), values.pop(), values.pop()));
+                values.push(operationExec(arr.pop(), values.pop(), values.pop()));
             }
             arr.push(expr[i]);
         }
     }
     while (arr.length !== 0) {
-        values.push(usePriority(arr.pop(), values.pop(), values.pop())); }
-    
-        return values.pop();
+        values.push(operationExec(arr.pop(), values.pop(), values.pop())); 
+    }
+    return values.pop();
 }
 
 module.exports = {
